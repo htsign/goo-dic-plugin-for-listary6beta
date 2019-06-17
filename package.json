@@ -1,0 +1,16 @@
+{
+  "name": "goo-dic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "htsign/goo-dic-plugin-for-listary6beta",
+  "author": "htsign",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "jsdom": "^15.1.1"
+  }
+}
