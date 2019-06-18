@@ -6,6 +6,17 @@ const especialKeywords = {
   '%2F': '%25252F', // /
 };
 
+/**
+ * @typedef {object} ListaryExtensionResult
+ * @property {number=} id
+ * @property {string=} title
+ * @property {string=} subtitle
+ * @property {*[]=} execution
+ */
+/**
+ * @param {string} query
+ * @returns {Promise<ListaryExtensionResult[]>}
+ */
 async function search(query) {
   const HOST = 'http://dictionary.goo.ne.jp';
   const keyword = Object.entries(especialKeywords)
