@@ -1,6 +1,12 @@
 const axios = require('axios');
+const zip = require('lodash.zip');
 const { JSDOM } = require('jsdom');
 
+/**
+ * @param {string} s
+ * @returns {string}
+ */
+const trimAndMergeLines = s => s.split('\n').map(x => x.trim()).filter(x => x).join(' ');
 const especialKeywords = {
   '%26': '%252526', // &
   '%2F': '%25252F', // /
@@ -33,21 +39,31 @@ async function search(query) {
   const { document } = dom.window;
 
   if (response.request.path.startsWith('/word/')) {
-    const meanInfo = document.querySelector('.mean_info');
-    const headerHinshi = document.querySelector('.header-hinshi');
-    const meanings = Array.from(document.querySelectorAll('.list-meanings > li'));
+    const parent = document.querySelector('.meanging .content-box-ej');
 
-    // remove all div elements inside of `.list-meanings > li`
-    for (const supInfo of meanings.reduce((acc, curr) => [...acc, ...curr.getElementsByTagName('div')], [])) {
-      supInfo.remove();
+    // remove all unnecessary elements
+    for (const element of [...parent.querySelectorAll('script, div.examples')]) {
+      element.remove();
     }
-    return [
-      { title: meanInfo.textContent.split('\n').map(x => x.trim()).join(' ') },
-      {
-        title: headerHinshi.textContent.trim(),
-        subtitle: meanings.map(x => x.textContent.trim()).join(' '),
-      },
-    ];
+
+    const wordClasses = Array.from(parent.querySelectorAll('.header-hinshi'), x => x.textContent.trim());
+
+    // if word classes are existed
+    if (wordClasses.length) {
+      const listMeanings = Array.from(
+        parent.querySelectorAll('.list-meanings'),
+        x => trimAndMergeLines(x.textContent),
+      );
+      return zip(wordClasses, listMeanings).map(([wc, lm]) => ({ title: wc, subtitle: lm }));
+    }
+    // proper nouns or ...
+    else {
+      const parents = Array.from(document.querySelectorAll('.meanging'));
+      return parents.map(x => ({
+        title: x.querySelector('.basic_title').textContent.trim(),
+        subtitle: trimAndMergeLines(x.querySelector('.content-box-ej').textContent),
+      }));
+    }
   }
   return Array.from(document.querySelectorAll('.search-list .content_list > li'), x => {
     return {
