@@ -38,6 +38,7 @@ async function search(query) {
   const dom = new JSDOM(response.data);
   const { document } = dom.window;
 
+  // true if response is redirected to word page directly
   if (response.request.path.startsWith('/word/')) {
     const parent = document.querySelector('.meanging .content-box-ej');
 
@@ -48,12 +49,8 @@ async function search(query) {
 
     const wordClasses = Array.from(parent.querySelectorAll('.header-hinshi'), x => x.textContent.trim());
 
-    // if word classes are existed
     if (wordClasses.length) {
-      const listMeanings = Array.from(
-        parent.querySelectorAll('.list-meanings'),
-        x => trimAndMergeLines(x.textContent),
-      );
+      const listMeanings = Array.from(parent.querySelectorAll('.list-meanings'), x => trimAndMergeLines(x.textContent));
       return zip(wordClasses, listMeanings).map(([wc, lm]) => ({ title: wc, subtitle: lm }));
     }
     // proper nouns or ...
@@ -65,12 +62,12 @@ async function search(query) {
       }));
     }
   }
-  return Array.from(document.querySelectorAll('.search-list .content_list > li'), x => {
-    return {
-      title: x.querySelector('.title').textContent.trim(),
-      subtitle: x.querySelector('.text').textContent.trim(),
-      execution: [_ => `${HOST}${x.querySelector('a[href]').href}`],
-    };
-  });
+
+  // list of meanings
+  return Array.from(document.querySelectorAll('.search-list .content_list > li'), x => ({
+    title: x.querySelector('.title').textContent.trim(),
+    subtitle: x.querySelector('.text').textContent.trim(),
+    execution: [_ => `${HOST}${x.querySelector('a[href]').href}`],
+  }));
 }
 module.exports = { search };
