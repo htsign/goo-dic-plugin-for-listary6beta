@@ -12,6 +12,12 @@ WebAPIがあればよかったんですがなさそうなので、Gooには申�
 
   rem このリポジトリをクローン
   git clone https://github.com/htsign/goo-dic-plugin-for-listary6beta goo-dic
+  
+  rem クローンしたディレクトリに移動
+  cd goo-dic
+  
+  rem 必要パッケージを追加ダウンロード
+  npm i
   ```
 2. Listaryが起動済みの場合は一旦終了して、再起動します。
 3. これで有効化されているはずですが、そうでない場合は「オプション」→「拡張子<sup>[1](#_1)</sup>」と進み、「Goo 辞書」を Enable にします。
