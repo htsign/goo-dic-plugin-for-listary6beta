@@ -10,7 +10,14 @@ async function search(query) {
   const HOST = 'http://dictionary.goo.ne.jp';
   const keyword = Object.entries(especialKeywords)
     .reduce((s, [key, val]) => s.split(key).join(val), encodeURIComponent(query));
-  const response = await axios(`${HOST}/srch/en/${keyword}/m0u/`);
+
+  let response;
+  try {
+    response = await axios(`${HOST}/srch/en/${keyword}/m0u/`);
+  }
+  catch (e) {
+    return [{ title: 'error', subtitle: e.message }];
+  }
   const dom = new JSDOM(response.data);
   const { document } = dom.window;
 
