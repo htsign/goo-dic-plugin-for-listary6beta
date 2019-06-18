@@ -7,8 +7,7 @@ async function search(query) {
   const dom = new JSDOM(response.data);
   const { document } = dom.window;
 
-  const contentList = document.querySelector('.content_list');
-  return Array.from(contentList ? contentList.children : [], x => {
+  return Array.from(document.querySelectorAll('.search-list .content_list > li'), x => {
     return {
       title: x.querySelector('.title').textContent.trim(),
       subtitle: x.querySelector('.text').textContent.trim(),
