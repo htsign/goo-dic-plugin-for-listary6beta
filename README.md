@@ -1,6 +1,6 @@
 # goo-dic-plugin-for-listary6beta
 
-[Listary 6 Beta](https://discussion.listary.com/t/listary-6-beta/4615) 用のGoo辞書プラグインです。  
+[Listary 6 Beta](https://discussion.listary.com/t/listary-6-beta/4615) 用の[Goo辞書](https://dictionary.goo.ne.jp/)プラグインです。  
 WebAPIがあればよかったんですがなさそうなので、Gooには申し訳ないと思いながらもスクレイピングしています。
 
 ## インストール
