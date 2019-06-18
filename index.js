@@ -1,5 +1,5 @@
 const axios = require('axios');
-const zip = require('lodash.zip');
+const { zip } = require('lodash');
 const { JSDOM } = require('jsdom');
 
 /**
