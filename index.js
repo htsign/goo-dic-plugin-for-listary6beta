@@ -7,6 +7,23 @@ async function search(query) {
   const dom = new JSDOM(response.data);
   const { document } = dom.window;
 
+  if (response.request.path.startsWith('/word/')) {
+    const meanInfo = document.querySelector('.mean_info');
+    const headerHinshi = document.querySelector('.header-hinshi');
+    const meanings = Array.from(document.querySelectorAll('.list-meanings > li'));
+
+    // remove all div elements inside of `.list-meanings > li`
+    for (const supInfo of meanings.reduce((acc, curr) => [...acc, ...curr.getElementsByTagName('div')], [])) {
+      supInfo.remove();
+    }
+    return [
+      { title: meanInfo.textContent.split('\n').map(x => x.trim()).join(' ') },
+      {
+        title: headerHinshi.textContent.trim(),
+        subtitle: meanings.map(x => x.textContent.trim()).join(' '),
+      },
+    ];
+  }
   return Array.from(document.querySelectorAll('.search-list .content_list > li'), x => {
     return {
       title: x.querySelector('.title').textContent.trim(),
