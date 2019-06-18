@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { zip } = require('lodash');
+const { flatMap, zip } = require('lodash');
 const { JSDOM } = require('jsdom');
 
 /**
@@ -40,27 +40,16 @@ async function search(query) {
 
   // true if response is redirected to word page directly
   if (response.request.path.startsWith('/word/')) {
-    const parent = document.querySelector('.meanging .content-box-ej');
+    const parents = Array.from(document.querySelectorAll('.meanging'));
 
     // remove all unnecessary elements
-    for (const element of [...parent.querySelectorAll('script, div.examples')]) {
+    for (const element of flatMap(parents, parent => [...parent.querySelectorAll('script, div.examples')])) {
       element.remove();
     }
 
-    const wordClasses = Array.from(parent.querySelectorAll('.header-hinshi'), x => x.textContent.trim());
-
-    if (wordClasses.length) {
-      const listMeanings = Array.from(parent.querySelectorAll('.list-meanings'), x => trimAndMergeLines(x.textContent));
-      return zip(wordClasses, listMeanings).map(([wc, lm]) => ({ title: wc, subtitle: lm }));
-    }
-    // proper nouns or ...
-    else {
-      const parents = Array.from(document.querySelectorAll('.meanging'));
-      return parents.map(x => ({
-        title: x.querySelector('.basic_title').textContent.trim(),
-        subtitle: trimAndMergeLines(x.querySelector('.content-box-ej').textContent),
-      }));
-    }
+    const titles = parents.map(x => x.querySelector('.basic_title').textContent.trim());
+    const contents = parents.map(x => trimAndMergeLines(x.querySelector('.content-box-ej').textContent));
+    return zip(titles, contents).map(([title, subtitle]) => ({ title, subtitle }));
   }
 
   // list of meanings
