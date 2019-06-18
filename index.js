@@ -1,9 +1,16 @@
 const axios = require('axios');
 const { JSDOM } = require('jsdom');
 
+const especialKeywords = {
+  '%26': '%252526', // &
+  '%2F': '%25252F', // /
+};
+
 async function search(query) {
   const HOST = 'http://dictionary.goo.ne.jp';
-  const response = await axios(`${HOST}/srch/en/${encodeURIComponent(query)}/m0u/`);
+  const keyword = Object.entries(especialKeywords)
+    .reduce((s, [key, val]) => s.split(key).join(val), encodeURIComponent(query));
+  const response = await axios(`${HOST}/srch/en/${keyword}/m0u/`);
   const dom = new JSDOM(response.data);
   const { document } = dom.window;
 
