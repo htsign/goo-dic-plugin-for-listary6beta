@@ -24,7 +24,7 @@ const especialKeywords = {
  * @returns {Promise<ListaryExtensionResult[]>}
  */
 async function search(query) {
-  const HOST = 'http://dictionary.goo.ne.jp';
+  const HOST = 'https://dictionary.goo.ne.jp';
   const keyword = Object.entries(especialKeywords)
     .reduce((s, [key, val]) => s.split(key).join(val), encodeURIComponent(query));
 
