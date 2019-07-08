@@ -1,6 +1,5 @@
-const axios = require('axios');
-const { flatMap, zip } = require('lodash');
-const { JSDOM } = require('jsdom');
+const client = require('cheerio-httpcli');
+const { zip } = require('lodash');
 
 /**
  * @param {string} s
@@ -28,35 +27,36 @@ async function search(query) {
   const keyword = Object.entries(especialKeywords)
     .reduce((s, [key, val]) => s.split(key).join(val), encodeURIComponent(query));
 
-  let response;
+  let res;
   try {
-    response = await axios(`${HOST}/srch/en/${keyword}/m0u/`);
+    res = await client.fetch(`${HOST}/srch/en/${keyword}/m0u/`);
   }
   catch (e) {
     return [{ title: 'error', subtitle: e.message }];
   }
-  const dom = new JSDOM(response.data);
-  const { document } = dom.window;
+  const { $ } = res;
 
   // true if response is redirected to word page directly
-  if (response.request.path.startsWith('/word/')) {
-    const parents = Array.from(document.querySelectorAll('.meanging'));
+  const info = $.documentInfo();
+  if (info.url.substring(HOST.length).startsWith('/word/')) {
+    const $parents = $('.meanging');
 
     // remove all unnecessary elements
-    for (const element of flatMap(parents, parent => [...parent.querySelectorAll('script, div.examples')])) {
-      element.remove();
-    }
+    $parents.find('script, div.examples').remove();
 
-    const titles = parents.map(x => x.querySelector('.basic_title').textContent.trim());
-    const contents = parents.map(x => trimAndMergeLines(x.querySelector('.content-box-ej').textContent));
+    const titles = $parents.map((_, x) => $(x).find('.basic_title').text().trim());
+    const contents = $parents.map((_, x) => trimAndMergeLines($(x).find('.content-box-ej').text()));
     return zip(titles, contents).map(([title, subtitle]) => ({ title, subtitle }));
   }
 
   // list of meanings
-  return Array.from(document.querySelectorAll('.search-list .content_list > li'), x => ({
-    title: x.querySelector('.title').textContent.trim(),
-    subtitle: x.querySelector('.text').textContent.trim(),
-    execution: [_ => `${HOST}${x.querySelector('a[href]').href}`],
-  }));
+  return $('.search-list .content_list > li').map((_, x) => {
+    const $x = $(x);
+    return {
+      title: $x.find('.title').text().trim(),
+      subtitle: $x.find('.text').text().trim(),
+      execution: [_ => `${HOST}${$x.find('a[href]').attr('href')}`],
+    };
+  }).toArray();
 }
 module.exports = { search };
