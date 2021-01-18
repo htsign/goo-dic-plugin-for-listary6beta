@@ -1,11 +1,11 @@
 const client = require('cheerio-httpcli');
-const { zip } = require('lodash');
+const { compact, join, map, pipe, split, trim, zip } = require('lodash/fp');
 
 /**
  * @param {string} s
  * @returns {string}
  */
-const trimAndMergeLines = s => s.split('\n').map(x => x.trim()).filter(x => x).join(' ');
+const trimAndMergeLines = pipe(split('\n'), map(trim), compact, join(' '));
 const especialKeywords = {
   '%26': '%252526', // &
   '%2F': '%25252F', // /
