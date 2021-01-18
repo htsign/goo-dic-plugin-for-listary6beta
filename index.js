@@ -12,11 +12,16 @@ const especialKeywords = {
 };
 
 /**
+ * @typedef {object} Execution
+ * @property {string} type 
+ * @property {string} url
+ */
+/**
  * @typedef {object} ListaryExtensionResult
  * @property {number=} id
  * @property {string=} title
  * @property {string=} subtitle
- * @property {*[]=} execution
+ * @property {Execution[]=} execution
  */
 /**
  * @param {string} query
@@ -55,7 +60,7 @@ async function search(query) {
     return {
       title: $x.find('.title').text().trim(),
       subtitle: $x.find('.text').text().trim(),
-      execution: [_ => `${HOST}${$x.find('a[href]').attr('href')}`],
+      execution: [{ type: 'OpenUrl', url: `${HOST}${$x.find('a[href]').attr('href')}` }],
     };
   }).toArray();
 }
